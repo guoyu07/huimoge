@@ -8,7 +8,7 @@
                      <p class="weui-flex__item" style="margin:15px;"> < </p>
                     </a>
                     <p class="weui-flex__item" style="margin:15px;"></p>
-                    <a href="/m/newjoke">
+                    <a href="/m/newwork">
                      <img src="/static/camera.png" style="width:40px;margin:15px;" alt="">
                     </a>
                 </div>
@@ -37,17 +37,17 @@
  
 <!-- my jokes --> 
    <div class="page__hd">
-        <p class="page__desc" style="padding:60px;">我的所有笑话</p>
+        <p class="page__desc" style="padding:60px;">我的所有作品</p>
     </div>
- <div class="page__bd" v-for="j in jokes">
+ <div class="page__bd" v-for="j in works">
   <div class="weui-panel weui-panel_access">
     <div class="weui-panel__bd">
         <a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg" style="align-items:flex-start;padding:8px;">
             <div class="weui-media-box__hd" style="width:40px;height:40px;">
-                <img class="weui-media-box__thumb" v-bind:src="j.author[0].avatar||'/static/default-img.png'" alt="" style="width:40px;height:40px;">
+                <img class="weui-media-box__thumb" v-bind:src="j.author.avatar||'/static/default-img.png'" alt="" style="width:40px;height:40px;">
             </div>
             <div class="weui-media-box__bd">
-                <h4 class="weui-media-box__title">{{j.author[0].nickname||j.author[0].username}}</h4>
+                <h4 class="weui-media-box__title">{{j.author.nickname||j.author.username}}</h4>
 
                 <p class="weui-media-box__desc">{{j.createdate | getYMD }}</p>
                 <p class="weui-media-box__desc">
@@ -102,35 +102,35 @@ export default {
   data () {
     return {
       userinfo: {},
-      jokes: [],
+      works: [],
       userurl: '/api/my',
-      jokeurl: '/api/my/jokes'
+      workurl: '/api/my/works'
     }
   },
   created () {
     this.getMy()
-    this.getJokes()
+    this.getWorks()
   },
 
   methods: {
     joke (j, jo) {
       if (jo) {
         j.joke += 1
-        axios.get(this.jokeurl + '/' + j._id + '?joke=1')
+        axios.get(this.workurl + '/' + j._id + '?joke=1')
       } else {
         j.unjoke += 1
-        axios.get(this.jokeurl + '/' + j._id + '?unjoke=1')
+        axios.get(this.workurl + '/' + j._id + '?unjoke=1')
       }
     },
     comment (j) {
-      var url = '/m/comment?jokeid=' + j._id
+      var url = '/m/comment?workid=' + j._id
       window.location.href = url
     },
     del (j) {
       var that = this
-      axios.delete('/api/jokes' + '/' + j._id)
+      axios.delete('/api/works' + '/' + j._id)
            .then(function (response) {
-             that.getJokes()
+             that.getWorks()
            })
     },
     admindel () {
@@ -138,7 +138,7 @@ export default {
       var jokeid = $('#deljokeid').val();
       /* eslint-enable */
       var that = this
-      axios.delete('/api/jokes' + '/' + jokeid)
+      axios.delete('/api/works' + '/' + jokeid)
         .then(function (response) {
           that.$router.push('/m')
         })
@@ -171,12 +171,12 @@ export default {
           window.location.reload()
         })
     },
-    getJokes () {
+    getWorks () {
       var that = this
-      axios.get(this.jokeurl)
+      axios.get(this.workurl)
         .then(function (response) {
           if (!response.data.err) {
-            that.jokes = response.data
+            that.works = response.data
           }
         })
     }

@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import My from 'views/My'
 import Mhome from 'views/Mhome'
 import Mlogin from 'views/Mlogin'
-import Mnewjoke from 'views/Mnewjoke'
+import Mnewwork from 'views/Mnewwork'
 import Mcrop from 'views/Mcrop'
 import Mcomment from 'views/Mcomment'
 
@@ -19,6 +19,6 @@ export default new Router({
     { path: '/m', name: 'home', component: Mhome },
     { path: '/m/comment', name: 'comment', component: Mcomment },
     { path: '/m/crop', name: 'crop', component: Mcrop },
-    { path: '/m/newjoke', name: 'newjoke', component: Mnewjoke }
+    { path: '/m/newwork', name: 'newwork', component: Mnewwork }
   ]
 })

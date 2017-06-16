@@ -1,5 +1,5 @@
 <template>
-<div class="page preview js_show" style="background-color:#eee" v-if="joke!=null">
+<div class="page preview js_show" style="background-color:#eee" v-if="work!=null">
 
  <div class="page__bd">
           <div class="page__bd page__bd_spacing" style="height:60px;">
@@ -8,7 +8,7 @@
                      <p class="weui-flex__item" style="margin:15px;"> < </p>
                     </a>
                     <p class="weui-flex__item" style="margin:15px;"></p>
-                    <a href="/m/newjoke">
+                    <a href="/m/newwork">
                      <img src="/static/camera.png" style="width:40px;margin:15px;" alt="">
                     </a>
                 </div>
@@ -17,21 +17,21 @@
     <div class="weui-panel__bd">
         <a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg" style="align-items:flex-start;padding:8px;">
             <div class="weui-media-box__hd" style="width:40px;height:40px;">
-                <img class="weui-media-box__thumb" v-bind:src="joke.author[0].avatar||'/static/default-img.png'" alt="" style="width:40px;height:40px;"> 
+                <img class="weui-media-box__thumb" v-bind:src="work.author.avatar||'/static/default-img.png'" alt="" style="width:40px;height:40px;"> 
             </div>
             <div class="weui-media-box__bd">
-                <h4 class="weui-media-box__title">{{joke.author[0].nickname||joke.author[0].username}}</h4>
+                <h4 class="weui-media-box__title">{{work.author.nickname||work.author.username}}</h4>
                 
-                <p class="weui-media-box__desc">{{joke.createdate | getYMD }}</p>
+                <p class="weui-media-box__desc">{{work.createdate | getYMD }}</p>
                 <p class="weui-media-box__desc">
                    <article class="weui-article" style="padding-left:0px;">
                      <section>
-                       <div v-html="joke.content" style="white-space:pre-wrap"> </div>
+                       <div v-html="work.content" style="white-space:pre-wrap"> </div>
                       
                        <div class="weui-form-preview__ft">
-                          <button type="submit" class="weui-form-preview__btn weui-form-preview__btn_primary" @click='jokeclick(joke,1)'><font><font><img  style="width:24px;" src="/static/joke.png"> {{joke.joke}}</font></font></button>
-                          <button type="submit" class="weui-form-preview__btn weui-form-preview__btn_primary"><font><font><img style="width:24px;" src="/static/comment.png"> {{joke.comment}}</font></font></button>
-                          <button type="submit" class="weui-form-preview__btn weui-form-preview__btn_primary" @click='jokeclick(joke,0)'><font><font><img style="width:24px;" src="/static/unjoke.png"> {{joke.unjoke}}</font></font></button>
+                          <button type="submit" class="weui-form-preview__btn weui-form-preview__btn_primary" @click='jokeclick(work,1)'><font><font><img  style="width:24px;" src="/static/joke.png"> {{work.joke}}</font></font></button>
+                          <button type="submit" class="weui-form-preview__btn weui-form-preview__btn_primary"><font><font><img style="width:24px;" src="/static/comment.png"> {{work.comment}}</font></font></button>
+                          <button type="submit" class="weui-form-preview__btn weui-form-preview__btn_primary" @click='jokeclick(joke,0)'><font><font><img style="width:24px;" src="/static/unjoke.png"> {{work.unjoke}}</font></font></button>
                        </div>
 
                        <template v-for="(c,index) in comments">
@@ -54,7 +54,7 @@
       <div class="weui-cell__bd">
        <input class="weui-input" style="margin:8px;" type="text" id="content" placeholder="评论...">
       </div>
-      <button class="weui-btn weui-btn_primary" style="width:80px;" @click="send(joke)">发送</button>
+      <button class="weui-btn weui-btn_primary" style="width:80px;" @click="send(work)">发送</button>
 
     </div>
   </div> <!-- weui-tab -->
@@ -68,15 +68,15 @@ import axios from 'axios'
 export default {
   data () {
     return {
-      joke: null,
-      jokeid: null,
+      work: null,
+      workid: null,
       comments: {},
-      jokeurl: '/api/jokes',
+      workurl: '/api/works',
       commentsurl: '/api/comments'
     }
   },
   created () {
-    this.getJokes()
+    this.getWork()
     this.getComments()
   },
 
@@ -84,10 +84,10 @@ export default {
     jokeclick (j, jo) {
       if (jo) {
         j.joke += 1
-        axios.get(this.jokeurl + '/' + j._id + '?joke=1')
+        axios.get(this.workurl + '/' + j._id + '?joke=1')
       } else {
         j.unjoke += 1
-        axios.get(this.jokeurl + '/' + j._id + '?unjoke=1')
+        axios.get(this.workurl + '/' + j._id + '?unjoke=1')
       }
     },
     send (j) {
@@ -107,19 +107,18 @@ export default {
     },
     getComments () {
       var that = this
-      this.jokeid = that.$route.query.jokeid
-      axios.get(this.commentsurl + '?jokeid=' + this.jokeid)
+      this.workid = that.$route.query.workid
+      axios.get(this.commentsurl + '?workid=' + this.workid)
         .then(function (response) {
           that.comments = response.data
         })
     },
-    getJokes () {
+    getWork () {
       var that = this
-      this.jokeid = that.$route.query.jokeid
-      axios.get(this.jokeurl + '/' + this.jokeid + '?populate=author')
+      this.workid = that.$route.query.workid
+      axios.get(this.workurl + '/' + this.workid + '?populate=author')
         .then(function (response) {
-          that.joke = response.data
-          console.log(that.joke.author[0])
+          that.work = response.data
         })
     }
   },

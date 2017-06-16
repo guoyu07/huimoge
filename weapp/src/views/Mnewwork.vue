@@ -5,7 +5,7 @@
      <div class="weui-cells weui-cells_form">
             <div class="weui-cell">
                 <div class="weui-cell__bd">
-                    <textarea class="weui-textarea" placeholder="这一刻的笑话..." rows="3" id="content"></textarea>
+                    <textarea class="weui-textarea" placeholder="写下赞扬你的作品的话..." rows="3" id="content"></textarea>
                 </div>
             </div>
 
@@ -68,7 +68,7 @@ export default {
       total: 0,
       done: 0,
       uploadurl: '/uploader/uploadimage?responseType=json',
-      jokeurl: '/api/jokes'
+      workurl: '/api/works'
     }
   },
   created () {
@@ -125,7 +125,7 @@ export default {
         content1 += '<img src="' + this.images[i] + '" >'
       }
       if (this.video !== null) {
-        axios.post(this.jokeurl, {
+        axios.post(this.workurl, {
           content: content1,
           videourl: this.video
         })
@@ -133,7 +133,7 @@ export default {
             that.$router.push('/')
           })
       } else {
-        axios.post(this.jokeurl, {
+        axios.post(this.workurl, {
           content: content1
         })
           .then(function (response) {

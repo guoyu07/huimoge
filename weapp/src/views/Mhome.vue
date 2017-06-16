@@ -1,15 +1,15 @@
 <template>
 <div class="page preview js_show" style="background-color:#eee">
 
- <div class="page__bd" v-for="j in jokes">
+ <div class="page__bd" v-for="j in works">
   <div class="weui-panel weui-panel_access">
     <div class="weui-panel__bd">
         <a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg" style="align-items:flex-start;padding:8px;">
             <div class="weui-media-box__hd" style="width:40px;height:40px;">
-                <img class="weui-media-box__thumb" v-bind:src="j.author[0].avatar||'/static/default-img.png'" alt="" style="width:40px;height:40px;"> 
+                <img class="weui-media-box__thumb" v-bind:src="j.author.avatar||'/static/default-img.png'" alt="" style="width:40px;height:40px;"> 
             </div>
             <div class="weui-media-box__bd">
-                <h4 class="weui-media-box__title">{{j.author[0].nickname||j.author[0].username}}</h4>
+                <h4 class="weui-media-box__title">{{j.author.nickname||j.author.username}}</h4>
                 
                 <p class="weui-media-box__desc">{{j.createdate | getYMD }}</p>
                 <p class="weui-media-box__desc">
@@ -44,7 +44,7 @@
           <div class="weui-footer">
             <p class="weui-footer__links">
                 <a href="http://github.com/asmcos/jsjoke" class="weui-footer__link">源代码</a>
-                <a href="" class="weui-footer__link">集思笑话</a>
+                <a href="" class="weui-footer__link">徽墨阁</a>
             </p>
             <p class="weui-footer__text">京ICP备17016493号</p>
             <p class="weui-footer__text">Copyright © 2017-2017 jsjoke.net</p>
@@ -84,13 +84,13 @@ import axios from 'axios'
 export default {
   data () {
     return {
-      jokes: null,
+      works: null,
       count: 20,
-      jokeurl: '/api/jokes'
+      workurl: '/api/works'
     }
   },
   created () {
-    this.getJokes()
+    this.getWorks()
   },
   mounted () {
     /* eslint-disable */
@@ -105,25 +105,25 @@ export default {
     joke (j, jo) {
       if (jo) {
         j.joke += 1
-        axios.get(this.jokeurl + '/' + j._id + '?joke=1')
+        axios.get(this.workurl + '/' + j._id + '?joke=1')
       } else {
         j.unjoke += 1
-        axios.get(this.jokeurl + '/' + j._id + '?unjoke=1')
+        axios.get(this.workurl + '/' + j._id + '?unjoke=1')
       }
     },
     comment (j) {
-      var url = '/m/comment?jokeid=' + j._id
+      var url = '/m/comment?workid=' + j._id
       window.location.href = url
     },
-    getJokes () {
+    getWorks () {
       var that = this
 
       if (that.$route.query.limit) {
         this.count = that.$route.query.limit
       }
-      axios.get(this.jokeurl + '?limit=' + this.count)
+      axios.get(this.workurl + '?limit=' + this.count)
         .then(function (response) {
-          that.jokes = response.data
+          that.works = response.data
         })
     }
   },

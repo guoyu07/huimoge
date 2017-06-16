@@ -11,11 +11,11 @@ var LEVEL_SHARE = 10;
 module.exports = function (app){
 	var mongoose = restful.mongoose
   //databases
-  mongoose.connect("mongodb://localhost/jsjokes")	
+  mongoose.connect("mongodb://localhost/huimoges")	
 
   //collection 1,
-  var Jokes = app.blogs = restful.model(
-		'jokes', mongoose.Schema({
+  var Works = app.blogs = restful.model(
+		'works', mongoose.Schema({
     title: String,
     content: String,
 		videourl: String,
@@ -25,7 +25,7 @@ module.exports = function (app){
     unjoke: {type:Number,default: 0},
     published: {type:Number, default:1 },// 1 ,show. 0. hide
     comments: [{type : mongoose.Schema.ObjectId, ref : 'comments'}], // 1 ,show. 0. hide
-    author  : [{type : mongoose.Schema.ObjectId, ref : 'accounts'}],
+    author  : {type : mongoose.Schema.ObjectId, ref : 'accounts'},
   }))
   .methods(['post','delete']);
 
@@ -43,11 +43,11 @@ module.exports = function (app){
     content : String,
     createdate : { type:Date, default: Date.now },
     author  : {type : mongoose.Schema.ObjectId, ref : 'accounts'},
-    joke    : {type : mongoose.Schema.ObjectId, ref : 'jokes'},
+    work    : {type : mongoose.Schema.ObjectId, ref : 'works'},
   }))
   .methods(['post']);
 
-  app.get('/api/jokes' ,function (req,res){
+  app.get('/api/works' ,function (req,res){
     var l = 0
     var s = 0
     var video = 0 // 0: haven't video ,1:only video , 2: all
@@ -75,25 +75,24 @@ module.exports = function (app){
     	var videoquery = {}
 		}
 
-    // Jokes.find( videoquery ,{comments:0}) //审核
-    Jokes.find( videoquery/*,{comments:0}*/)
+    // Works.find( videoquery ,{comments:0}) //审核
+    Works.find( videoquery/*,{comments:0}*/)
          .limit(l)
          .skip(s)
          .sort('-_id')
          .populate({ path: 'author', select: {'avatar':1,'nickname':1,'level':1,'username':1} })
          .populate({ path: 'comments',
-                     // options: {sort: {'_id': -1 }}, 
                      populate: {path: 'author', select: {'nickname':1,'username':1}}})
-         .exec(function (err, jokes) {
+         .exec(function (err, works) {
            if (err) return handleError(err);
-           res.json(jokes)
+           res.json(works)
          })
    })
  
-   // get jokes end
+   // get works end
 
-   // get use own jokes
-   app.get('/api/my/jokes',function(req,res){
+   // get use own works
+   app.get('/api/my/works',function(req,res){
      if(!req.isAuthenticated()){
         return res.json({"err":"need login"})
      } else {
@@ -107,8 +106,8 @@ module.exports = function (app){
       	 s = req.query.skip
     	 }
 
-       // Jokes.find({author:[req.user._id]} ,{comments:0} ) // 审核 
-       Jokes.find({author:[req.user._id]}/*,{comments:0}*/)
+       // Works.find({author:[req.user._id]} ,{comments:0} ) // 审核 
+       Works.find({author:[req.user._id]}/*,{comments:0}*/)
               .sort('-_id')
 							.limit(l)
 							.skip(s)
@@ -116,17 +115,17 @@ module.exports = function (app){
               .populate({ path: 'comments',
                      // options: {sort: {'_id': -1 }}, 
                      populate: {path: 'author', select: {'nickname':1,'username':1}}})
-              .exec(function (err, jokes) {
+              .exec(function (err, works) {
                 if (err) return handleError(err);
-                res.json(jokes)
+                res.json(works)
               })
      }
    })
  
-   // joke or unjoke
-   app.get('/api/jokes/:id',function(req,res){
+   // a work
+   app.get('/api/works/:id',function(req,res){
 
-      Jokes.findOne({'_id': req.params['id']})
+      Works.findOne({'_id': req.params['id']})
            .populate({ path: 'author', select: {'avatar':1,'nickname':1,'level':1,'username':1} })
            .exec(function(err,j){
              if (req.query['joke']){
@@ -153,10 +152,10 @@ module.exports = function (app){
    /*****************************************************/
    // id is jokeid ,val is + level value 
    function update_author_level (id,val) {
-    Jokes.findOne({_id:id})
+    Works.findOne({_id:id})
        .populate('author')
        .exec(function(error,cursor) {
-          var author = cursor.author[0]
+          var author = cursor.author
           accounts.update({_id:author._id},{level:author.level+val},function(e,a){
           })
         })
@@ -171,7 +170,7 @@ module.exports = function (app){
 			})
    }
 
-  Jokes.before('post', function(req, res, next) {
+  Works.before('post', function(req, res, next) {
     if(req.isAuthenticated()){
       req.body['createdate'] = Date() + ''
       req.body['pv'] = 1
@@ -186,7 +185,7 @@ module.exports = function (app){
     } 
   })
 
-  Jokes.before('put', function(req, res, next) {
+  Works.before('put', function(req, res, next) {
     if(req.isAuthenticated()){
       
       next();
@@ -195,13 +194,13 @@ module.exports = function (app){
     } 
   })
 
-  Jokes.before('delete', function(req, res, next) {
+  Works.before('delete', function(req, res, next) {
     var user = req.user.toJSON()
     if (req.isAuthenticated() && (user.admin==1)){
 		  next();	
     } else if(req.isAuthenticated()){
       
-      Jokes.findOne({'_id': req.params['id']})
+      Works.findOne({'_id': req.params['id']})
            .populate({ path: 'author', select: {'avatar':1,'nickname':1,'level':1,'username':1} })
            .exec(function(err,j){
 							if (j.author[0]._id == req.user._id.toString()){
@@ -216,7 +215,7 @@ module.exports = function (app){
   })
 
 
-	Jokes.register(app,'/api/jokes')
+	Works.register(app,'/api/works')
 
 
   // get user sort
@@ -238,8 +237,8 @@ module.exports = function (app){
     if(req.isAuthenticated()){
       req.body['createdate'] = Date()
       req.body['author'] = req.user._id
-      req.body['joke'] = req.query.id
-      update_author_level(req.query.id,LEVEL_COMMENT) // joke
+      req.body['work'] = req.query.id
+      update_author_level(req.query.id,LEVEL_COMMENT) // works
       next();
     } else {
       res.sendStatus(403);
@@ -249,7 +248,7 @@ module.exports = function (app){
   comments.after('post', function(req, res, next) {
     if(req.isAuthenticated()){ 
       
-      Jokes.findOneAndUpdate({_id:req.query.id},
+      Works.findOneAndUpdate({_id:req.query.id},
                            {$push: { comments: res.locals.bundle._id} },function(err, count, resp){
             });
       next();
@@ -259,8 +258,8 @@ module.exports = function (app){
   })
 
   app.get('/api/comments' ,function (req,res){
-    var jokeid = req.query.jokeid
-    comments.find({joke:jokeid})
+    var workid = req.query.workid
+    comments.find({work:workid})
          // .sort('-_id')
          .populate({ path: 'author', select: {'avatar':1,'nickname':1,'level':1,'username':1} })
          .exec(function (err, comments) {
@@ -294,9 +293,9 @@ module.exports = function (app){
 
 
 /*
-GET    /jokes
-GET    /jokes/:id
-POST   /jokes
-PUT    /jokes/:id
-DELETE /jokes/:id
+GET    /works
+GET    /works/:id
+POST   /works
+PUT    /works/:id
+DELETE /works/:id
 */

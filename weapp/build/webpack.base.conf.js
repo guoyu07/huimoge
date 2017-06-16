@@ -10,7 +10,7 @@ function resolve (dir) {
 
 module.exports = {
   entry: {
-    mapp: './wxapp/src/m.js'
+    mapp: './weapp/src/m.js'
   },
   output: {
     path: config.build.wxassetsRoot,
